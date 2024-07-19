@@ -22,5 +22,4 @@ public class ModelContorller {
         eventPublisher.publishEvent(new RipDataUpdatedEvent(ripData));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 }
