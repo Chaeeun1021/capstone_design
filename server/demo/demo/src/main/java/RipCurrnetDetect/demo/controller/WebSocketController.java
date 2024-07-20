@@ -20,7 +20,6 @@ public class WebSocketController {
     }
     @EventListener
     public void updateRipData(RipDataUpdatedEvent event) {
-        // 데이터 처리
         // 구독자에게 전송
         simpMessageSendingOperations.convertAndSend("/topic/ripData", event.getRipData());
     }

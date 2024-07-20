@@ -1,14 +1,13 @@
 package RipCurrnetDetect.demo.event;
 
-import RipCurrnetDetect.demo.dto.RipData;
+import RipCurrnetDetect.demo.dto.RipCurrentDTO;
 
 public class RipDataUpdatedEvent {
-    private final RipData ripData;
-
-    public RipDataUpdatedEvent(RipData ripData) {
-        this.ripData = ripData;
+    private final RipCurrentDTO ripCurrentDTO;
+    public RipDataUpdatedEvent(RipCurrentDTO ripCurrentDTO) {
+        this.ripCurrentDTO = ripCurrentDTO;
     }
-    public RipData getRipData() {
-        return ripData;
+    public RipCurrentDTO getRipData() {
+        return ripCurrentDTO;
     }
 }

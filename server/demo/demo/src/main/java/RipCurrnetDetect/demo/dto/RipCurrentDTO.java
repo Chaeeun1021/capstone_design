@@ -9,14 +9,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RipData {
+public class RipCurrentDTO {
     @JsonProperty("date_time")
     private String dateTime;
 
     @JsonProperty("bounding_count")
     private int boundingCount;
 
-    private List<int[]> drawing;
+    private List<Integer[]> drawing;
 
     @Override
     public String toString() {
