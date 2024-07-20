@@ -7,7 +7,7 @@ public class RipDataUpdatedEvent {
     public RipDataUpdatedEvent(RipCurrentDTO ripCurrentDTO) {
         this.ripCurrentDTO = ripCurrentDTO;
     }
-    public RipCurrentDTO getRipData() {
+    public RipCurrentDTO getRipCurrentDTO() {
         return ripCurrentDTO;
     }
 }

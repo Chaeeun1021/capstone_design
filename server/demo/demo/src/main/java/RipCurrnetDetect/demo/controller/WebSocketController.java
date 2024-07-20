@@ -21,6 +21,6 @@ public class WebSocketController {
     @EventListener
     public void updateRipData(RipDataUpdatedEvent event) {
         // 구독자에게 전송
-        simpMessageSendingOperations.convertAndSend("/topic/ripData", event.getRipData());
+        simpMessageSendingOperations.convertAndSend("/topic/ripData", event.getRipCurrentDTO());
     }
 }
