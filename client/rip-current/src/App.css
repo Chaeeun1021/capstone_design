@@ -1,0 +1,34 @@
+/* App.css or your custom CSS file */
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+}
+
+.App-header nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.App-header nav ul li {
+  display: inline;
+  margin: 0 10px;
+}
+
+.App-header nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.video-container {
+  width: 100%;
+  height: calc(100vh - 80px); /* Adjust the height based on the header height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black; /* Optional: background color for the video container */
+}
