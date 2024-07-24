@@ -1,12 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import './App.css';
 import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';
+import { Client } from '@stomp/stompjs';
 
 function App() {
   // HLS 스트리밍 URL
   const hlsStreamUrl = 'http://4.217.235.155/stream/index.m3u8'; // 여기에 실제 HLS 스트리밍 주소 입력
+
+  useEffect(() => {
+    const client = new Client({
+      brokerURL: 'ws://localhost:8080/ws', // 서버의 웹소켓 엔드포인트 주소
+      onConnect: () => {
+        console.log('Connected');
+        client.subscribe('/topic/ripData', (message) => {
+          const data = JSON.parse(message.body);
+          console.log('Received message:', data);
+        });
+      },
+      onStompError: (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message']);
+        console.error('Additional details: ' + frame.body);
+      },
+    });
+
+    client.activate();
+
+    return () => {
+      client.deactivate();
+    };
+  }, []);
 
   return (
     <Router>
