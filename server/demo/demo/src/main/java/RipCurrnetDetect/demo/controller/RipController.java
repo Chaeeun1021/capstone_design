@@ -47,5 +47,4 @@ public class RipController {
     public List<RipCurrent> ripList() {
         return ripService.findAll();
     }
-
 }
