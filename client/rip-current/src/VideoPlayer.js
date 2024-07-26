@@ -31,7 +31,7 @@ const VideoPlayer = ({ src }) => {
       if (videoRef.current) {
         const options = {
           autoplay: true,
-          controls: true,
+          controls: false,
           sources: [{
             src: `${src}?timestamp=${new Date().getTime()}`, // 타임스탬프 추가
             type: 'application/x-mpegURL' // HLS 스트리밍 타입

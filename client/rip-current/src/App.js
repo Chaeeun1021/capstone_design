@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     const client = new Client({
-      brokerURL: 'ws://localhost:8080/ws', // 서버의 웹소켓 엔드포인트 주소
+      brokerURL: 'ws://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ws', // 서버의 웹소켓 엔드포인트 주소
       onConnect: () => {
         console.log('Connected');
         client.subscribe('/topic/ripData', (message) => {
