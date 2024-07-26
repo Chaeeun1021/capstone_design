@@ -16,17 +16,5 @@ public class RipCurrentDTO {
     @JsonProperty("bounding_count")
     private int boundingCount;
 
-    private List<Integer[]> drawing;
-
-    @Override
-    public String toString() {
-        return "RipData{" +
-                "dateTime='" + dateTime + '\'' +
-                ", boundingCount=" + boundingCount +
-                ", drawing="
-                + Arrays.toString(drawing.get(0))
-                + Arrays.toString(drawing.get(1))
-                + Arrays.toString(drawing.get(2))
-                + Arrays.toString(drawing.get(3)) + '}';
-    }
+    private List<List<Integer[]>> drawing;
 }

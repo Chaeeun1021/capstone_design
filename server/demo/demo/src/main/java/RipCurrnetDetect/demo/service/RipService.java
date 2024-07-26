@@ -16,10 +16,20 @@ public class RipService {
     private final RipRepository ripRepository;
     // 이안류 데이터 저장
     public RipCurrent saveRip(RipCurrentDTO ripCurrentDTO) throws JsonProcessingException {
-        // dto -> entity 변환
-        RipCurrent ripCurrent = convertToEntity(ripCurrentDTO);
+       // dto -> entity 변환
+        RipCurrent ripCurrent = new RipCurrent();
+        ripCurrent.setDateTime(ripCurrentDTO.getDateTime());
+        ripCurrent.setBoundingCount(ripCurrentDTO.getBoundingCount());
+        // List<Integer[]> 타입의 데이터를 DB에 저장하기 어려우므로 String으로 변환하여 저장
+        List<List<Integer[]>> drawingDatas = ripCurrentDTO.getDrawing();
+        for (List<Integer[]> drawing : drawingDatas) {
+            ripCurrent.setDrawing(DataConvertor.listToString(ripCurrentDTO.getDrawing()));
+            ripCurrent = convertToEntity(ripCurrentDTO);
+        }
         // db 저장
         ripRepository.save(ripCurrent);
+
+
         return ripCurrent;
     }
 
