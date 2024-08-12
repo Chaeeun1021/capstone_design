@@ -4,29 +4,12 @@ import 'video.js/dist/video-js.css';
 import 'videojs-contrib-hls';
 import './VideoPlayer.css'; // CSS 파일을 임포트
 
-const VideoPlayer = ({ src }) => {
+const VideoPlayer = ({ src, coordinates }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const [overlayData, setOverlayData] = useState(null);
 
   useEffect(() => {
-    const mockData = {
-      x: 100,
-      y: 400,
-      width: 70,
-      height: 100
-    };
-    setOverlayData(mockData);
-
-    const showOverlay = () => {
-      setOverlayData(mockData);
-      setTimeout(() => {
-        setOverlayData(null);
-      }, 5000); // Remove overlay after 5 seconds
-    };
-
-    showOverlay();
-
     const initPlayer = () => {
       if (videoRef.current) {
         const options = {
@@ -43,6 +26,35 @@ const VideoPlayer = ({ src }) => {
         });
 
         playerRef.current = player;
+
+        player.on('loadedmetadata', () => {
+          const videoElement = player.el().querySelector('video');
+          const videoWidth = videoElement.videoWidth;
+          const videoHeight = videoElement.videoHeight;
+          const containerWidth = videoElement.clientWidth;
+          const containerHeight = videoElement.clientHeight;
+
+          // 비디오 중앙 위치 계산
+          const scale = Math.min(containerWidth / videoWidth, containerHeight / videoHeight);
+          const actualVideoWidth = videoWidth * scale;
+          const actualVideoHeight = videoHeight * scale;
+
+          const offsetX = (containerWidth - actualVideoWidth) / 2;
+          const offsetY = (containerHeight - actualVideoHeight) / 2;
+
+          // 좌표 기반 오버레이 위치 설정
+          if (coordinates) {
+            const overlayPosition = {
+              x: coordinates.x + offsetX,
+              y: coordinates.y + offsetY,
+              width: coordinates.width,
+              height: coordinates.height,
+            };
+
+            console.log('Overlay Position:', overlayPosition);
+            setOverlayData(overlayPosition);
+          }
+        });
 
         return () => {
           if (playerRef.current) {
@@ -61,8 +73,28 @@ const VideoPlayer = ({ src }) => {
         console.log('Player disposed');
       }
     };
+  }, [src]); // src만 종속성 배열에 추가
 
-  }, [src]);
+  useEffect(() => {
+    if (coordinates) {
+      // 좌표가 변경될 때 오버레이 설정
+      const overlayPosition = {
+        x: coordinates.x,
+        y: coordinates.y,
+        width: coordinates.width,
+        height: coordinates.height,
+      };
+
+      console.log('Updated Overlay Position:', overlayPosition);
+      setOverlayData(overlayPosition);
+
+      const timeout = setTimeout(() => {
+        setOverlayData(null);
+      }, 5000);
+
+      return () => clearTimeout(timeout); // 컴포넌트 언마운트 시 타이머 제거
+    }
+  }, [coordinates]); // coordinates가 변경될 때마다 오버레이 설정
 
   return (
     <div className="video-container">
