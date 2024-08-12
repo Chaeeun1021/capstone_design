@@ -8,6 +8,7 @@ const VideoPlayer = ({ src, coordinates }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const [overlayData, setOverlayData] = useState(null);
+  const [timeoutId, setTimeoutId] = useState(null);
 
   useEffect(() => {
     const initPlayer = () => {
@@ -73,7 +74,7 @@ const VideoPlayer = ({ src, coordinates }) => {
         console.log('Player disposed');
       }
     };
-  }, [src]); // src만 종속성 배열에 추가
+  }, [src]);
 
   useEffect(() => {
     if (coordinates) {
@@ -88,13 +89,27 @@ const VideoPlayer = ({ src, coordinates }) => {
       console.log('Updated Overlay Position:', overlayPosition);
       setOverlayData(overlayPosition);
 
-      const timeout = setTimeout(() => {
+      // 이전 타이머가 있다면 클리어
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      // 새로운 타이머 설정
+      const newTimeoutId = setTimeout(() => {
         setOverlayData(null);
       }, 5000);
-
-      return () => clearTimeout(timeout); // 컴포넌트 언마운트 시 타이머 제거
+      
+      setTimeoutId(newTimeoutId); // 타이머 ID 저장
     }
-  }, [coordinates]); // coordinates가 변경될 때마다 오버레이 설정
+
+    // 좌표가 변경될 때마다 클리어할 타이머가 필요한 경우, 클린업 함수 추가
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+
+  }, [coordinates]);
 
   return (
     <div className="video-container">
