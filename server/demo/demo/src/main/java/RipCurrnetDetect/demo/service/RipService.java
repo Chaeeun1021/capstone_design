@@ -8,12 +8,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RipService {
     private final RipRepository ripRepository;
+
     // 이안류 데이터 저장
     public RipCurrent saveRip(RipCurrentDTO ripCurrentDTO) throws JsonProcessingException {
         RipCurrent ripCurrent = null;
@@ -33,8 +37,18 @@ public class RipService {
     }
 
     // 이안류 데이터 전체 조회
-    public List<RipCurrent> findAll() {
+    public List<RipCurrent> findAllList() {
         return ripRepository.findAll();
     }
+
+    public List<RipCurrent> findRecentList(LocalDateTime requestTime) {
+        // 시간을 이안류 데이터 날짜 형식으로 포맷팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+
+        String startDateTime = requestTime.minusHours(24).format(formatter);
+        String endDateTime = requestTime.format(formatter);
+
+        return ripRepository.findRipWithin24Hours(startDateTime, endDateTime);
+        }
 
 }

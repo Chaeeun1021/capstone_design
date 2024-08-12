@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -45,6 +47,14 @@ public class RipController {
     /* db에 저장된 이안류 데이터 반환 */
     @GetMapping("/ripList")
     public List<RipCurrent> ripList() {
-        return ripService.findAll();
+        return ripService.findAllList();
+    }
+
+    @GetMapping("/ripList/recent")
+    public List<RipCurrent> getStudentsAddedInLast24Hours() {
+        // 현재 시간 생성
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        return ripService.findRecentList(currentTime);
     }
 }
