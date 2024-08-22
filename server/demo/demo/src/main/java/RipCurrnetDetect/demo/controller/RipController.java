@@ -9,13 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -50,11 +48,35 @@ public class RipController {
         return ripService.findAllList();
     }
 
+    /* 최근 24시 이내 데이터 반환 */
     @GetMapping("/ripList/recent")
-    public List<RipCurrent> getStudentsAddedInLast24Hours() {
+    public List<RipCurrent> recentRipData() {
         // 현재 시간 생성
         LocalDateTime currentTime = LocalDateTime.now();
-
+        // 요청시간의 24시 이내 데이터 조회
         return ripService.findRecentList(currentTime);
     }
+
+    /* 시작과 종료 기간에 따른 데이터 반환
+    * 날짜 형식: start_date=2024-07-26&end_date=2024-07-27
+    * 시간 형식: start_time=16:38:40&end_time=16:38:59
+    * */
+    @GetMapping("/ripList/period")
+    public List<RipCurrent> periodRipData(@RequestParam("start_date") LocalDate startDate,
+                                          @RequestParam(value = "start_time", required = false) String startTime,
+                                          @RequestParam("end_date") LocalDate endDate,
+                                          @RequestParam(value = "end_time", required = false) String endTime) {
+        // 시작과 종료 시간의 기본값은 00:00:00 ~ 23:59:59
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        if(startTime != null) {
+            startDateTime = LocalDateTime.of(startDate, LocalTime.parse(startTime));
+        }
+        if(endTime != null) {
+            endDateTime = LocalDateTime.of(endDate, LocalTime.parse(endTime));
+        }
+         return ripService.findPeriodList(startDateTime, endDateTime);
+    }
+
 }

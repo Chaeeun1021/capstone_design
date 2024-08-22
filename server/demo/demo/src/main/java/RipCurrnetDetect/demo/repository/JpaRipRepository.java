@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface JpaRipRepository extends JpaRepository<RipCurrent, Long>, RipRepository {
     @Query("SELECT r FROM RipCurrent r WHERE r.dateTime BETWEEN :startDateTime AND :endDateTime")
-    List<RipCurrent> findRipWithin24Hours(
+    List<RipCurrent> findByDateBetween(
             @Param("startDateTime") String startDateTime,
             @Param("endDateTime") String endDateTime
     );

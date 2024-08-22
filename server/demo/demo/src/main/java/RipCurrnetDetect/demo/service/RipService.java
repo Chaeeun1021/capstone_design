@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,13 +41,20 @@ public class RipService {
     }
 
     public List<RipCurrent> findRecentList(LocalDateTime requestTime) {
-        // 시간을 이안류 데이터 날짜 형식으로 포맷팅
+        // 시간을 이안류 DB 데이터 날짜 형식으로 포맷팅
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-
         String startDateTime = requestTime.minusHours(24).format(formatter);
         String endDateTime = requestTime.format(formatter);
 
-        return ripRepository.findRipWithin24Hours(startDateTime, endDateTime);
+        return ripRepository.findByDateBetween(startDateTime, endDateTime);
         }
 
+    public List<RipCurrent> findPeriodList(LocalDateTime requestStartDateTime, LocalDateTime requestEndndDateTime) {
+        // 시간을 이안류 DB 데이터 날짜 형식으로 포맷팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String startDateTime = requestStartDateTime.format(formatter);
+        String endDateTime = requestEndndDateTime.format(formatter);
+
+        return ripRepository.findByDateBetween(startDateTime, endDateTime);
+    }
 }
