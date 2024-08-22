@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
@@ -132,3 +133,4 @@ const VideoPlayer = ({ src, coordinates }) => {
 };
 
 export default VideoPlayer;
+

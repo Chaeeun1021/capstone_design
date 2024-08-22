@@ -1,8 +1,10 @@
+
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, NavLink, Routes } from 'react-router-dom'; // Link 대신 NavLink 사용
 import './App.css';
 import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';
+import PastDataViewer from './PastDataViewer'
 import { Client } from '@stomp/stompjs';
 
 function App() {
@@ -23,11 +25,6 @@ function App() {
           const y = data.drawing[0][0][1] -(1080/2);
           const width = data.drawing[0][1][0] - data.drawing[0][0][0];
           const height = data.drawing[0][3][1] - data.drawing[0][0][1];
-
-          // const x = -(1920/2);
-          // const y = -(1080/2);
-          // const width = 100;
-          // const height = 100;
 
           console.log('Calculated coordinates:', { x, y, width, height });
 
@@ -63,19 +60,32 @@ function App() {
         <header className="App-header">
           <nav>
             <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/videoTest">Video Test</Link></li>
-              <li><Link to="/page1">Page 1</Link></li>
-              <li><Link to="/page2">Page 2</Link></li>
+              <li>
+                <NavLink 
+                  to="/" 
+                  style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
+                  end
+                >
+                  실시간 영상
+                </NavLink>
+              </li>
+              <li>
+                <NavLink 
+                  to="/pastData" 
+                  style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
+                >
+                  과거 데이터 조회
+                </NavLink>
+              </li>
             </ul>
           </nav>
         </header>
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<h2>Home</h2>} />
-            <Route path="/videoTest" element={<VideoPlayer src={hlsStreamUrl} coordinates={coordinates} />} />
-            <Route path="/page1" element={<h2>Page 1</h2>} />
-            <Route path="/page2" element={<h2>Page 2</h2>} />
+            {/* 실시간 비디오 페이지 */}
+            <Route path="/" element={<VideoPlayer src={hlsStreamUrl} coordinates={coordinates} />} />
+            {/* 과거 데이터 조회 페이지 */}
+            <Route path="/pastData" element={<PastDataViewer />} />
           </Routes>
         </main>
         <footer>
@@ -86,4 +96,7 @@ function App() {
   );
 }
 
+
+
 export default App;
+
