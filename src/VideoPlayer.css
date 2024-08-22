@@ -1,0 +1,35 @@
+/* VideoPlayer.css */
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+.video-js .vjs-tech {
+  width: 100%; /* 비디오가 컨테이너에 맞춰지도록 설정 */
+  height: auto;
+  object-fit: cover; /* 비디오를 컨테이너에 맞추는 데 사용 */
+}
+
+.video-wrapper {
+  position: relative; /* 비디오와 오버레이가 같은 기준을 가지도록 설정 */
+  width: 100%;
+  max-width: 100%; /* 비디오의 너비가 화면을 넘지 않도록 설정 */
+}
+
+.overlay-box {
+  position: absolute; /* 위치를 절대적으로 설정 */
+  background-color: rgba(255, 0, 0, 0.5); /* 오버레이의 배경 색상 (필요에 따라 조정) */
+  border: 2px solid red; /* 오버레이 박스 스타일 */
+}
+
+
+.overlay {
+  position: absolute; /* 오버레이를 비디오 내부에 위치시킵니다. */
+  border: 2px solid red; /* 오버레이 박스 스타일 */
+  pointer-events: none; /* 오버레이 클릭 방지 */
+}
