@@ -1,0 +1,43 @@
+/* App.css or your custom CSS file */
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  position: fixed; /* 상단에 고정 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* 다른 요소들 위에 오도록 설정 */
+}
+
+.App-header nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.App-header nav ul li {
+  display: inline;
+  margin: 0 10px;
+}
+
+.App-header nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.main-content {
+  padding-top: 80px; /* 상단바의 높이에 맞게 패딩 설정 */
+}
+
+.video-container {
+  width: 100%;
+  height: calc(100vh - 80px); /* 상단바 높이를 뺀 화면 전체 높이 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black; /* Optional: background color for the video container */
+}
