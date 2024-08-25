@@ -1,4 +1,5 @@
 /* App.css or your custom CSS file */
+
 .App {
   text-align: center;
 }
@@ -40,4 +41,26 @@
   justify-content: center;
   align-items: center;
   background-color: black; /* Optional: background color for the video container */
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px; /* Adjust as needed */
+  margin: auto;
+}
+
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.bounding-box {
+  border: 2px solid red;
+  position: absolute;
+  pointer-events: none;
 }

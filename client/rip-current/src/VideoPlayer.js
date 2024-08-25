@@ -1,136 +1,149 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import videojs from 'video.js';
+import Hls from 'hls.js';
 import 'video.js/dist/video-js.css';
-import 'videojs-contrib-hls';
-import './VideoPlayer.css'; // CSS 파일을 임포트
+import './VideoPlayer.css'; // CSS 파일 임포트
 
-const VideoPlayer = ({ src, coordinates }) => {
+const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, showOverlay }) => {
   const videoRef = useRef(null);
-  const playerRef = useRef(null);
-  const [overlayData, setOverlayData] = useState(null);
-  const [timeoutId, setTimeoutId] = useState(null);
+  const [localStartTime, setLocalStartTime] = useState(null);
+  const [player, setPlayer] = useState(null);
+  const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
+
+  // 비디오 크기 업데이트 함수
+  const updateVideoDimensions = () => {
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      setVideoDimensions({
+        width: videoElement.videoWidth,
+        height: videoElement.videoHeight,
+      });
+    }
+  };
 
   useEffect(() => {
-    const initPlayer = () => {
-      if (videoRef.current) {
-        const options = {
-          autoplay: true,
-          controls: false,
-          sources: [{
-            src: `${src}?timestamp=${new Date().getTime()}`, // 타임스탬프 추가
-            type: 'application/x-mpegURL' // HLS 스트리밍 타입
-          }]
-        };
+    const videoElement = videoRef.current;
 
-        const player = videojs(videoRef.current, options, () => {
-          console.log('Player is ready');
-        });
+    if (!videoElement) return;
 
-        playerRef.current = player;
+    // HLS.js를 사용하여 HLS 스트림 처리
+    let hls;
+    if (Hls.isSupported()) {
+      hls = new Hls();
+      hls.loadSource(src);
+      hls.attachMedia(videoElement);
 
-        player.on('loadedmetadata', () => {
-          const videoElement = player.el().querySelector('video');
-          const videoWidth = videoElement.videoWidth;
-          const videoHeight = videoElement.videoHeight;
-          const containerWidth = videoElement.clientWidth;
-          const containerHeight = videoElement.clientHeight;
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        videoElement.play();
+        updateVideoDimensions(); // 비디오의 원본 크기를 가져옴
+      });
 
-          // 비디오 중앙 위치 계산
-          const scale = Math.min(containerWidth / videoWidth, containerHeight / videoHeight);
-          const actualVideoWidth = videoWidth * scale;
-          const actualVideoHeight = videoHeight * scale;
-
-          const offsetX = (containerWidth - actualVideoWidth) / 2;
-          const offsetY = (containerHeight - actualVideoHeight) / 2;
-
-          // 좌표 기반 오버레이 위치 설정
-          if (coordinates) {
-            const overlayPosition = {
-              x: coordinates.x + offsetX,
-              y: coordinates.y + offsetY,
-              width: coordinates.width,
-              height: coordinates.height,
-            };
-
-            console.log('Overlay Position:', overlayPosition);
-            setOverlayData(overlayPosition);
-          }
-        });
-
-        return () => {
-          if (playerRef.current) {
-            playerRef.current.dispose();
-            console.log('Player disposed');
-          }
-        };
-      }
-    };
-
-    initPlayer();
-
-    return () => {
-      if (playerRef.current) {
-        playerRef.current.dispose();
-        console.log('Player disposed');
-      }
-    };
-  }, [src]);
-
-  useEffect(() => {
-    if (coordinates) {
-      // 좌표가 변경될 때 오버레이 설정
-      const overlayPosition = {
-        x: coordinates.x,
-        y: coordinates.y,
-        width: coordinates.width,
-        height: coordinates.height,
-      };
-
-      console.log('Updated Overlay Position:', overlayPosition);
-      setOverlayData(overlayPosition);
-
-      // 이전 타이머가 있다면 클리어
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      // 새로운 타이머 설정
-      const newTimeoutId = setTimeout(() => {
-        setOverlayData(null);
-      }, 5000);
-      
-      setTimeoutId(newTimeoutId); // 타이머 ID 저장
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error('HLS.js Error:', data);
+      });
+    } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+      videoElement.src = src;
+      videoElement.addEventListener('loadedmetadata', () => {
+        videoElement.play();
+        updateVideoDimensions(); // 비디오의 원본 크기를 가져옴
+      });
+    } else {
+      console.error('HLS is not supported in this browser.');
     }
 
-    // 좌표가 변경될 때마다 클리어할 타이머가 필요한 경우, 클린업 함수 추가
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
+    // Video.js 초기화
+    const playerInstance = videojs(videoElement, {
+      controls: true,
+      autoplay: true,
+      muted: true,
+      fluid: true,
+      preload: 'auto',
+    });
+
+    setPlayer(playerInstance);
+
+    // 비디오 재생 시간 업데이트 핸들러
+    const handleTimeUpdate = () => {
+      if (!localStartTime) return;
+      const currentTime = playerInstance.currentTime();
+      const currentDate = new Date(localStartTime + currentTime * 1000);
+
+      const timestamp = currentDate
+        .toISOString()
+        .replace(/[-:T]/g, '')
+        .split('.')[0];
+      const formattedTimestamp = `${timestamp.slice(0, 8)}_${timestamp.slice(8)}`;
+
+      onTimeUpdate(formattedTimestamp);
     };
 
-  }, [coordinates]);
+    playerInstance.on('timeupdate', handleTimeUpdate);
+
+    // 클린업 함수
+    return () => {
+      if (playerInstance) {
+        playerInstance.dispose();
+      }
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [src, onTimeUpdate, serverStartTime, localStartTime]);
+
+  // 비디오 크기에 맞춰 좌표를 스케일링하는 함수
+  const scaleCoordinates = (box) => {
+    const { width: videoWidth, height: videoHeight } = videoDimensions;
+    const container = videoRef.current?.getBoundingClientRect();
+
+    if (!container || videoWidth === 0 || videoHeight === 0) {
+      return box;
+    }
+
+    // 비디오의 원본 크기 대비 현재 크기 비율 계산
+    const scaleX = container.width / videoWidth;
+    const scaleY = container.height / videoHeight;
+
+    return {
+      x: box.x * scaleX,
+      y: box.y * scaleY,
+      width: box.width * scaleX,
+      height: box.height * scaleY,
+    };
+  };
 
   return (
     <div className="video-container">
-      <video ref={videoRef} className="video-js vjs-default-skin vjs-big-play-centered" playsInline></video>
-      {overlayData && (
-        <div className="overlay">
-          <div
-            className="overlay-box"
-            style={{
-              top: `${overlayData.y}px`,
-              left: `${overlayData.x}px`,
-              width: `${overlayData.width}px`,
-              height: `${overlayData.height}px`,
-            }}
-          ></div>
-        </div>
-      )}
+      <div className="video-wrapper">
+        <video
+          ref={videoRef}
+          className="video-js vjs-default-skin vjs-big-play-centered"
+          controls
+          playsInline
+        />
+        {showOverlay && (
+          <div className="overlay">
+            {coordinates.map((box, index) => {
+              const scaledBox = scaleCoordinates(box);
+              return (
+                <div
+                  key={index}
+                  className="box"
+                  style={{
+                    position: 'absolute',
+                    left: `${scaledBox.x}px`,
+                    top: `${scaledBox.y}px`,
+                    width: `${scaledBox.width}px`,
+                    height: `${scaledBox.height}px`,
+                    border: '2px solid red',
+                  }}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default VideoPlayer;
-

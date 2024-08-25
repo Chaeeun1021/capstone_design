@@ -1,49 +1,88 @@
 .layout-wrapper {
-    display: block; /* 기본적으로 세로로 배치되도록 block 레이아웃 설정 */
-    width: 100%;
-  }
-  
-  .image-container {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 20px; /* 이미지 아래 여백 */
-  }
-  
-  .left-panel, .right-panel {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .panel-wrapper {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .left-panel {
-    width: 40%;
-    padding: 20px;
-    background-color: #f0f0f0;
-  }
-  
-  .right-panel {
-    width: 55%;
-    background-color: #f9f9f9;
-    padding: 20px;
-  }
-  
-  .data-list ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .data-list li {
-    margin-bottom: 10px;
-  }
-  
-  button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.video-container {
+  width: 100%;
+  height: calc(100vh - 80px); /* 상단바 높이를 뺀 전체 높이 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black; /* 배경색을 App.css와 동일하게 설정 */
+}
+
+.video-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-js {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+}
+
+.left-panel {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.datetime-picker {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.datetime-picker label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.custom-datepicker, .custom-timepicker {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.custom-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+}
+
+.custom-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.date-range-info, .data-list {
+  margin-top: 20px;
+}
+
+.data-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.data-list li {
+  margin-bottom: 10px;
+}

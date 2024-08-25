@@ -1,58 +1,78 @@
-
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, NavLink, Routes } from 'react-router-dom'; // Link 대신 NavLink 사용
+import React, { useEffect, useState, useRef } from 'react';
+import { BrowserRouter as Router, Route, NavLink, Routes } from 'react-router-dom';
 import './App.css';
 import VideoPlayer from './VideoPlayer';
 import Timeline from './Timeline';
-import PastDataViewer from './PastDataViewer'
-import { Client } from '@stomp/stompjs';
+import PastDataViewer from './PastDataViewer';
+import { Client } from '@stomp/stompjs'; // STOMP 클라이언트 사용
 
 function App() {
-  const hlsStreamUrl = 'http://4.217.235.155/stream/index.m3u8'; // HLS 스트리밍 URL
+  const hlsStreamUrl = 'http://4.217.235.155/stream/index.m3u8'; // HLS 비디오 스트림 URL
+  const [coordinates, setCoordinates] = useState([]); // 좌표 데이터
+  const clientRef = useRef(null); // STOMP 클라이언트 인스턴스를 저장하는 ref
 
-  const [coordinates, setCoordinates] = useState(null);
+  // WebSocket 연결 함수
+  const connectWebSocket = () => {
+    if (!clientRef.current) {
+      clientRef.current = new Client({
+        brokerURL: 'ws://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ws', // WebSocket 서버 URL
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
 
-  useEffect(() => {
-    const client = new Client({
-      brokerURL: 'ws://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ws', // 웹소켓 엔드포인트
-      onConnect: () => {
-        console.log('Connected');
-        client.subscribe('/topic/ripData', (message) => {
-          const data = JSON.parse(message.body);
-          console.log('Received message:', data);
+        onConnect: () => {
+          console.log('WebSocket connection established.');
 
-          const x = data.drawing[0][0][0] -(1920/2);
-          const y = data.drawing[0][0][1] -(1080/2);
-          const width = data.drawing[0][1][0] - data.drawing[0][0][0];
-          const height = data.drawing[0][3][1] - data.drawing[0][0][1];
+          // STOMP 메시지 구독
+          clientRef.current.subscribe('/topic/ripData', (message) => {
+            const data = JSON.parse(message.body);
+            console.log('Received message:', data);
 
-          console.log('Calculated coordinates:', { x, y, width, height });
+            if (data.drawing) {
+              // 좌표 데이터 업데이트
+              const newCoordinates = data.drawing.map((box) => {
+                const x = box[0][0]; 
+                const y = box[0][1]; 
+                const width = box[1][0] - box[0][0]; 
+                const height = box[3][1] - box[0][1];
 
-          setCoordinates({
-            x: x,
-            y: y,
-            width: width,
-            height: height,
+                return { x, y, width, height };
+              });
+
+              setCoordinates(newCoordinates); // 좌표 업데이트
+            }
           });
+        },
 
-          // 5초 후에 좌표를 초기화
-          setTimeout(() => {
-            setCoordinates(null);
-          }, 5000);
-        });
-      },
-      onStompError: (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
-      },
-    });
+        onStompError: (frame) => {
+          console.error('Broker reported error: ' + frame.headers['message']);
+          console.error('Additional details: ' + frame.body);
+        },
 
-    client.activate();
+        onWebSocketClose: (event) => {
+          console.error('WebSocket connection closed: ', event);
+        },
+
+        onWebSocketError: (event) => {
+          console.error('WebSocket error: ', event);
+        }
+      });
+
+      clientRef.current.activate(); // WebSocket 연결 시작
+    }
+  };
+
+  // WebSocket 연결 및 정리
+  useEffect(() => {
+    connectWebSocket();
 
     return () => {
-      client.deactivate();
+      if (clientRef.current) {
+        clientRef.current.deactivate();
+        console.log('WebSocket connection closed on cleanup.');
+      }
     };
-  }, []);
+  }, []); // 처음 렌더링 시 WebSocket 연결
 
   return (
     <Router>
@@ -61,19 +81,12 @@ function App() {
           <nav>
             <ul>
               <li>
-                <NavLink 
-                  to="/" 
-                  style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
-                  end
-                >
+                <NavLink to="/" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })} end>
                   실시간 영상
                 </NavLink>
               </li>
               <li>
-                <NavLink 
-                  to="/pastData" 
-                  style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}
-                >
+                <NavLink to="/pastData" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
                   과거 데이터 조회
                 </NavLink>
               </li>
@@ -82,9 +95,14 @@ function App() {
         </header>
         <main className="main-content">
           <Routes>
-            {/* 실시간 비디오 페이지 */}
-            <Route path="/" element={<VideoPlayer src={hlsStreamUrl} coordinates={coordinates} />} />
-            {/* 과거 데이터 조회 페이지 */}
+            <Route 
+              path="/" 
+              element={<VideoPlayer 
+                          src={hlsStreamUrl} 
+                          coordinates={coordinates} 
+                          showOverlay={true} // 오버레이 표시를 위한 prop
+                       />} 
+            />
             <Route path="/pastData" element={<PastDataViewer />} />
           </Routes>
         </main>
@@ -96,7 +114,4 @@ function App() {
   );
 }
 
-
-
 export default App;
-
