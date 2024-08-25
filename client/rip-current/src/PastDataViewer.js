@@ -27,13 +27,22 @@ function PastDataViewer() {
     setLoading(true);
 
     // 날짜를 yyyy-MM-dd 형식으로 변환
-    const startDate = selectedStartDate.toISOString().split('T')[0];
-    const endDate = selectedEndDate.toISOString().split('T')[0];
+    const offset = selectedStartDate.getTimezoneOffset() * 60000; 
+    const startDate = new Date(selectedStartDate.getTime() - offset).toISOString().split('T')[0];
+    const endDate = new Date(selectedEndDate.getTime() - offset).toISOString().split('T')[0];
 
+  
     // 시간이 정확히 초 단위까지 포함되도록
-    const startTime = selectedStartTime.includes(':') ? selectedStartTime : `${selectedStartTime}:00`;
-    const endTime = selectedEndTime.includes(':') ? selectedEndTime : `${selectedEndTime}:00`;
-
+    const startTime = (selectedStartTime.split(':').length === 2 ? `${selectedStartTime}:00` : selectedStartTime);
+    const endTime = (selectedEndTime.split(':').length === 2 ? `${selectedEndTime}:00` : selectedEndTime);
+    console.log('지금 선택된 시작시간:', startTime)
+    // 요청 파라미터 출력 
+    console.log('Request Params:', {
+      start_date: startDate,
+      start_time: startTime,
+      end_date: endDate,
+      end_time: endTime,
+    });
     // API 요청 보내기
     axios
       .get('https://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ripList/period', {
@@ -105,6 +114,7 @@ function PastDataViewer() {
             type="time"
             value={selectedStartTime}
             onChange={(e) => setSelectedStartTime(e.target.value)}
+            timeFormat="HH:mm:ss"
             className="custom-timepicker"
           />
         </div>
@@ -115,6 +125,7 @@ function PastDataViewer() {
             type="time"
             value={selectedEndTime}
             onChange={(e) => setSelectedEndTime(e.target.value)}
+            timeFormat="HH:mm:ss"
             className="custom-timepicker"
           />
         </div>
