@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
-import VideoPlayer from './VideoPlayer'; // VideoPlayer 임포트
 
 function PastDataViewer() {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
-  const [selectedStartTime, setSelectedStartTime] = useState('00:00:00'); // 초까지 추가
-  const [selectedEndTime, setSelectedEndTime] = useState('23:59:59'); // 초까지 추가
+  const [selectedStartTime, setSelectedStartTime] = useState('00:00:00');
+  const [selectedEndTime, setSelectedEndTime] = useState('23:59:59');
   const [dataList, setDataList] = useState([]);
+  const [coordinates, setCoordinates] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [serverStartTime, setServerStartTime] = useState(null); // 서버 시작 시간 상태
+
+  const imageSrc = "/beach2.PNG"; // public 폴더의 beach2.PNG 이미지
+  const canvasRef = useRef(null);
 
   const handleFetchData = () => {
     if (!selectedStartDate || !selectedEndDate) {
@@ -26,24 +28,13 @@ function PastDataViewer() {
 
     setLoading(true);
 
-    // 날짜를 yyyy-MM-dd 형식으로 변환
     const offset = selectedStartDate.getTimezoneOffset() * 60000; 
     const startDate = new Date(selectedStartDate.getTime() - offset).toISOString().split('T')[0];
     const endDate = new Date(selectedEndDate.getTime() - offset).toISOString().split('T')[0];
 
-  
-    // 시간이 정확히 초 단위까지 포함되도록
     const startTime = (selectedStartTime.split(':').length === 2 ? `${selectedStartTime}:00` : selectedStartTime);
     const endTime = (selectedEndTime.split(':').length === 2 ? `${selectedEndTime}:00` : selectedEndTime);
-    console.log('지금 선택된 시작시간:', startTime)
-    // 요청 파라미터 출력 
-    console.log('Request Params:', {
-      start_date: startDate,
-      start_time: startTime,
-      end_date: endDate,
-      end_time: endTime,
-    });
-    // API 요청 보내기
+
     axios
       .get('https://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ripList/period', {
         params: {
@@ -54,13 +45,38 @@ function PastDataViewer() {
         },
       })
       .then((response) => {
-        setDataList(response.data);
-        setLoading(false);
+        const responseData = response.data;
 
-        if (response.data.length > 0) {
-          const firstItem = response.data[0];
-          setServerStartTime(new Date(firstItem.serverStartTime).getTime() || null); // 서버 시작 시간 설정
-        }
+        const newCoordinates = responseData.flatMap((item) => {
+          if (typeof item.drawing === 'string') {
+            try {
+              const parsedDrawing = JSON.parse(item.drawing);
+              if (Array.isArray(parsedDrawing) && parsedDrawing.length === 4) {
+                const [topLeft, topRight, bottomRight, bottomLeft] = parsedDrawing;
+                return [{
+                  topLeft: { x: topLeft[0], y: topLeft[1] },
+                  bottomRight: { x: bottomRight[0], y: bottomRight[1] },
+                }];
+              }
+            } catch (error) {
+              console.error('Error parsing drawing:', error);
+              return [];
+            }
+          } else if (Array.isArray(item.drawing) && item.drawing.length === 4) {
+            const [topLeft, topRight, bottomRight, bottomLeft] = item.drawing;
+            return [{
+              topLeft: { x: topLeft[0], y: topLeft[1] },
+              bottomRight: { x: bottomRight[0], y: bottomRight[1] },
+            }];
+          } else {
+            console.error('Invalid drawing format:', item.drawing);
+            return [];
+          }
+        });
+
+        setCoordinates(newCoordinates);
+        setDataList(responseData);
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -68,21 +84,40 @@ function PastDataViewer() {
       });
   };
 
-  const handleTimeUpdate = (timestamp) => {
-    console.log('Video Timestamp:', timestamp);
-  };
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    coordinates.forEach(({ topLeft, bottomRight }) => {
+      const x = topLeft.x * canvas.width / 1920;
+      const y = topLeft.y * canvas.height / 1080;
+      const width = (bottomRight.x - topLeft.x) * canvas.width / 1920;
+      const height = (bottomRight.y - topLeft.y) * canvas.height / 1080;
+
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, width, height);
+    });
+  }, [coordinates]);
 
   return (
     <div className="layout-wrapper">
-      <div className="video-container">
-        <VideoPlayer 
-          src="http://4.217.235.155/stream/index.m3u8" // 하드코딩된 비디오 URL
-          onTimeUpdate={handleTimeUpdate}
-          serverStartTime={serverStartTime}
-        />
+      <div className="image-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+        <div style={{ position: 'relative' }}>
+          <img src={imageSrc} alt="Beach Scene" width="1920" height="1080" />
+          <canvas
+            ref={canvasRef}
+            width="1920"
+            height="1080"
+            style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+          />
+        </div>
       </div>
 
-      <div className="left-panel">
+      {/* 텍스트 영역을 이미지 아래로 이동 */}
+      <div className="left-panel" style={{ paddingTop: '20px', textAlign: 'center' }}>
         <h2>과거 데이터 조회</h2>
         <p>날짜와 시간을 선택하고 데이터를 조회하세요.</p>
 

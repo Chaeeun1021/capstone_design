@@ -1,19 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import videojs from 'video.js';
 import Hls from 'hls.js';
 import 'video.js/dist/video-js.css';
-import './VideoPlayer.css'; // CSS 파일 임포트
+import './VideoPlayer.css';
 
-const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, showOverlay }) => {
+const VideoPlayer = memo(({ src, coordinates = [], onTimeUpdate, showOverlay }) => {
   const videoRef = useRef(null);
-  const [localStartTime, setLocalStartTime] = useState(null);
   const [player, setPlayer] = useState(null);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
 
-  // 비디오 크기 업데이트 함수
+  // 비디오 메타데이터가 로드될 때 비디오 크기 업데이트
   const updateVideoDimensions = () => {
     const videoElement = videoRef.current;
-    if (videoElement) {
+    if (videoElement && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
       setVideoDimensions({
         width: videoElement.videoWidth,
         height: videoElement.videoHeight,
@@ -26,7 +25,6 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
 
     if (!videoElement) return;
 
-    // HLS.js를 사용하여 HLS 스트림 처리
     let hls;
     if (Hls.isSupported()) {
       hls = new Hls();
@@ -35,7 +33,7 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         videoElement.play();
-        updateVideoDimensions(); // 비디오의 원본 크기를 가져옴
+        updateVideoDimensions(); // 메타데이터가 로드되면 비디오 크기 업데이트
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
@@ -45,28 +43,26 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
       videoElement.src = src;
       videoElement.addEventListener('loadedmetadata', () => {
         videoElement.play();
-        updateVideoDimensions(); // 비디오의 원본 크기를 가져옴
+        updateVideoDimensions(); // 메타데이터가 로드되면 비디오 크기 업데이트
       });
     } else {
       console.error('HLS is not supported in this browser.');
     }
 
-    // Video.js 초기화
     const playerInstance = videojs(videoElement, {
       controls: true,
       autoplay: true,
-      muted: true,
+      muted: true, // 자동 재생 허용을 위한 음소거
       fluid: true,
       preload: 'auto',
     });
 
     setPlayer(playerInstance);
 
-    // 비디오 재생 시간 업데이트 핸들러
     const handleTimeUpdate = () => {
-      if (!localStartTime) return;
+      if (!playerInstance) return;
       const currentTime = playerInstance.currentTime();
-      const currentDate = new Date(localStartTime + currentTime * 1000);
+      const currentDate = new Date(currentTime * 1000);
 
       const timestamp = currentDate
         .toISOString()
@@ -79,7 +75,7 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
 
     playerInstance.on('timeupdate', handleTimeUpdate);
 
-    // 클린업 함수
+    // 정리 작업
     return () => {
       if (playerInstance) {
         playerInstance.dispose();
@@ -88,27 +84,24 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
         hls.destroy();
       }
     };
-  }, [src, onTimeUpdate, serverStartTime, localStartTime]);
+  }, [src, onTimeUpdate]);
 
-  // 비디오 크기에 맞춰 좌표를 스케일링하는 함수
-  const scaleCoordinates = (box) => {
+  // 좌표 스케일링 함수
+  const scaleCoordinates = (points) => {
     const { width: videoWidth, height: videoHeight } = videoDimensions;
     const container = videoRef.current?.getBoundingClientRect();
 
     if (!container || videoWidth === 0 || videoHeight === 0) {
-      return box;
+      return points;
     }
 
-    // 비디오의 원본 크기 대비 현재 크기 비율 계산
     const scaleX = container.width / videoWidth;
     const scaleY = container.height / videoHeight;
 
-    return {
-      x: box.x * scaleX,
-      y: box.y * scaleY,
-      width: box.width * scaleX,
-      height: box.height * scaleY,
-    };
+    return points.map(({ x, y }) => ({
+      x: x * scaleX,
+      y: y * scaleY,
+    }));
   };
 
   return (
@@ -120,23 +113,21 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
           controls
           playsInline
         />
-        {showOverlay && (
+        {showOverlay && coordinates.length > 0 && (
           <div className="overlay">
             {coordinates.map((box, index) => {
               const scaledBox = scaleCoordinates(box);
               return (
-                <div
-                  key={index}
-                  className="box"
-                  style={{
-                    position: 'absolute',
-                    left: `${scaledBox.x}px`,
-                    top: `${scaledBox.y}px`,
-                    width: `${scaledBox.width}px`,
-                    height: `${scaledBox.height}px`,
-                    border: '2px solid red',
-                  }}
-                />
+                <svg key={index} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>
+                  <polygon
+                    points={scaledBox.map(p => `${p.x},${p.y}`).join(' ')}
+                    style={{
+                      fill: 'none',
+                      stroke: 'red',
+                      strokeWidth: 2,
+                    }}
+                  />
+                </svg>
               );
             })}
           </div>
@@ -144,6 +135,6 @@ const VideoPlayer = ({ src, coordinates = [], onTimeUpdate, serverStartTime, sho
       </div>
     </div>
   );
-};
+});
 
 export default VideoPlayer;

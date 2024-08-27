@@ -29,14 +29,14 @@ function App() {
             console.log('Received message:', data);
 
             if (data.drawing) {
-              // 좌표 데이터 업데이트
+              // 좌표 데이터 업데이트 (각 모서리 좌표로 변환)
               const newCoordinates = data.drawing.map((box) => {
-                const x = box[0][0]; 
-                const y = box[0][1]; 
-                const width = box[1][0] - box[0][0]; 
-                const height = box[3][1] - box[0][1];
-
-                return { x, y, width, height };
+                return [
+                  { x: box[0][0], y: box[0][1] }, // Top-left
+                  { x: box[1][0], y: box[1][1] }, // Top-right
+                  { x: box[2][0], y: box[2][1] }, // Bottom-right
+                  { x: box[3][0], y: box[3][1] }, // Bottom-left
+                ];
               });
 
               setCoordinates(newCoordinates); // 좌표 업데이트
