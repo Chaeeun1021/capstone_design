@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import './PastDataViewer.css'
 
 function PastDataViewer() {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
@@ -12,8 +13,9 @@ function PastDataViewer() {
   const [coordinates, setCoordinates] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const imageSrc = "/beach2.PNG"; // public 폴더의 beach2.PNG 이미지
+  const imageSrc = "/beach2.PNG"; // 이미지 경로
   const canvasRef = useRef(null);
+  const imageContainerRef = useRef(null);
 
   const handleFetchData = () => {
     if (!selectedStartDate || !selectedEndDate) {
@@ -28,7 +30,7 @@ function PastDataViewer() {
 
     setLoading(true);
 
-    const offset = selectedStartDate.getTimezoneOffset() * 60000; 
+    const offset = selectedStartDate.getTimezoneOffset() * 60000;
     const startDate = new Date(selectedStartDate.getTime() - offset).toISOString().split('T')[0];
     const endDate = new Date(selectedEndDate.getTime() - offset).toISOString().split('T')[0];
 
@@ -87,15 +89,34 @@ function PastDataViewer() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    const imageContainer = imageContainerRef.current;
+
+    // 이미지 컨테이너의 크기 계산
+    const containerWidth = imageContainer.offsetWidth;
+    const containerHeight = imageContainer.offsetHeight;
+
+    // 캔버스 크기 조정
+    canvas.width = containerWidth;
+    canvas.height = containerHeight;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    coordinates.forEach(({ topLeft, bottomRight }) => {
-      const x = topLeft.x * canvas.width / 1920;
-      const y = topLeft.y * canvas.height / 1080;
-      const width = (bottomRight.x - topLeft.x) * canvas.width / 1920;
-      const height = (bottomRight.y - topLeft.y) * canvas.height / 1080;
+    // 원본 이미지 크기 (1920x1080)
+    const originalWidth = 1920;
+    const originalHeight = 1080;
 
+    // 크기 비율 계산
+    const widthRatio = containerWidth / originalWidth;
+    const heightRatio = containerHeight / originalHeight;
+
+    coordinates.forEach(({ topLeft, bottomRight }) => {
+      // 좌표 변환
+      const x = topLeft.x * widthRatio;
+      const y = topLeft.y * heightRatio;
+      const width = (bottomRight.x - topLeft.x) * widthRatio;
+      const height = (bottomRight.y - topLeft.y) * heightRatio;
+
+      // 사각형 그리기
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 2;
       ctx.strokeRect(x, y, width, height);
@@ -104,23 +125,13 @@ function PastDataViewer() {
 
   return (
     <div className="layout-wrapper">
-      <div className="image-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <div style={{ position: 'relative' }}>
-          <img src={imageSrc} alt="Beach Scene" width="1920" height="1080" />
-          <canvas
-            ref={canvasRef}
-            width="1920"
-            height="1080"
-            style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-          />
-        </div>
+      <div className="image-container" ref={imageContainerRef}>
+        <img src={imageSrc} alt="Beach Scene" className="responsive-image" />
+        <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0 }} />
       </div>
 
-      {/* 텍스트 영역을 이미지 아래로 이동 */}
-      <div className="left-panel" style={{ paddingTop: '20px', textAlign: 'center' }}>
+      <div className="left-panel">
         <h2>과거 데이터 조회</h2>
-        <p>날짜와 시간을 선택하고 데이터를 조회하세요.</p>
-
         <div className="datetime-picker">
           <label>시작 날짜:</label>
           <DatePicker
@@ -169,20 +180,12 @@ function PastDataViewer() {
           {loading ? '데이터 불러오는 중...' : '데이터 조회'}
         </button>
 
-        <div className="date-range-info">
-          <h3>선택한 날짜 범위:</h3>
-          <p>시작 날짜: {selectedStartDate ? selectedStartDate.toLocaleDateString() : '선택되지 않음'}</p>
-          <p>종료 날짜: {selectedEndDate ? selectedEndDate.toLocaleDateString() : '선택되지 않음'}</p>
-          <p>시작 시간: {selectedStartTime}</p>
-          <p>종료 시간: {selectedEndTime}</p>
-        </div>
-
         <div className="data-list">
           <h3>기간 내 발생 데이터 정보</h3>
           {loading ? (
             <p>데이터를 불러오는 중...</p>
           ) : (
-            <ul>
+            <ul className="scrollable-list">
               {dataList.length > 0 ? (
                 dataList.map((item, index) => (
                   <li key={index}>
@@ -195,6 +198,8 @@ function PastDataViewer() {
             </ul>
           )}
         </div>
+
+        <button className="download-button">다운로드</button>
       </div>
     </div>
   );

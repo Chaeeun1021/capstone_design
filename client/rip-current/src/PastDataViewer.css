@@ -1,88 +1,82 @@
 .layout-wrapper {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row; /* 가로 정렬 */
+  justify-content: flex-start;
+  align-items: flex-start;
   width: 100%;
+  height: 100vh;
 }
 
-.video-container {
-  width: 100%;
-  height: 100vh; /* 화면 전체 높이로 설정 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: black; /* 배경색을 App.css와 동일하게 설정 */
+.image-container {
+  flex: 3;
+  position: relative;
+  width: 100%; /* 가로로 꽉 채우기 */
+  height: 100%; /* 세로로 꽉 채우기 */
 }
 
-.video-wrapper {
+.responsive-image {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.video-js {
-  width: 100%;
-  height: 100%;
-  /* max-width 및 max-height 제거 */
-  object-fit: contain; /* 비디오가 컨테이너 안에 맞게 조정 */
+  object-fit: cover; /* div에 꽉 차게 이미지 설정 */
 }
 
 .left-panel {
-  width: 100%;
-  max-width: 400px;
+  flex: 1;
   padding: 20px;
   background-color: #f0f0f0;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .datetime-picker {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.datetime-picker label {
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-
-.custom-datepicker, .custom-timepicker {
-  padding: 10px;
-  font-size: 16px;
+.custom-datepicker,
+.custom-timepicker {
+  padding: 8px;
+  font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 4px;
   width: 100%;
-  box-sizing: border-box;
 }
 
 .custom-button {
   background-color: #4CAF50;
   color: white;
-  padding: 10px 20px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   width: 100%;
+  margin-bottom: 20px;
 }
 
-.custom-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.date-range-info, .data-list {
+.data-list {
   margin-top: 20px;
 }
 
-.data-list ul {
+.scrollable-list {
   list-style-type: none;
   padding: 0;
+  max-height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
-.data-list li {
-  margin-bottom: 10px;
+.download-button {
+  background-color: #008CBA;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
 }
