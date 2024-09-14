@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter as Router, Route, NavLink, Routes } from 'react-router-dom';
 import './App.css';
 import VideoPlayer from './VideoPlayer';
+import Alert from './Alert';
 import Timeline from './Timeline';
 import PastDataViewer from './PastDataViewer';
 import { Client } from '@stomp/stompjs'; // STOMP 클라이언트 사용
@@ -81,6 +82,11 @@ function App() {
           <nav>
             <ul>
               <li>
+                <NavLink to="/alert" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
+                  실시간 알림
+                </NavLink>
+              </li>
+              <li>
                 <NavLink to="/" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })} end>
                   실시간 영상
                 </NavLink>
@@ -95,15 +101,16 @@ function App() {
         </header>
         <main className="main-content">
           <Routes>
-            <Route 
-              path="/" 
-              element={<VideoPlayer 
-                          src={hlsStreamUrl} 
-                          coordinates={coordinates} 
-                          showOverlay={true} // 오버레이 표시를 위한 prop
-                       />} 
+            <Route
+              path="/"
+              element={<VideoPlayer
+                src={hlsStreamUrl}
+                coordinates={coordinates}
+                showOverlay={true} // 오버레이 표시를 위한 prop
+              />}
             />
             <Route path="/pastData" element={<PastDataViewer />} />
+            <Route path="/alert" element={<Alert />} />
           </Routes>
         </main>
         <footer>

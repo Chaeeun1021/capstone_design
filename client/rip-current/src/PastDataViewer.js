@@ -13,7 +13,7 @@ function PastDataViewer() {
   const [coordinates, setCoordinates] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const imageSrc = "/beach2.PNG"; // 이미지 경로
+  const imageSrc = process.env.PUBLIC_URL + "/beach2.PNG"; // 이미지 경로
   const canvasRef = useRef(null);
   const imageContainerRef = useRef(null);
 
