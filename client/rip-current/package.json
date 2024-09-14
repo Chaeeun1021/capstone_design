@@ -51,5 +51,5 @@
     "@babel/preset-env": "^7.24.8",
     "babel-polyfill": "^6.26.0"
   },
-  "homepage": "https://chaeeun1021.github.io/capstone_design/"
+  "homepage": "https://ripcurrent.netlify.app/"
 }
