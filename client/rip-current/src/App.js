@@ -4,7 +4,7 @@ import './App.css';
 import VideoPlayer from './VideoPlayer';
 import Alert from './Alert';
 import Timeline from './Timeline';
-import PastDataViewer from './PastDataViewer';
+import PastDataViewer from './PastDataViewer'; // 확장자를 제거하고 가져옵니다.
 import { Client } from '@stomp/stompjs'; // STOMP 클라이언트 사용
 
 function App() {
