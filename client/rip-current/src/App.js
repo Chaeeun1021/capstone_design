@@ -110,7 +110,11 @@ function App() {
               />}
             />
             <Route path="/pastData" element={<PastDataViewer />} />
-            <Route path="/alert" element={<Alert />} />
+            <Route 
+            path="/alert" 
+            element={<Alert
+              coordinates={coordinates}
+              showOverlay={true} />} />
           </Routes>
         </main>
         <footer>
