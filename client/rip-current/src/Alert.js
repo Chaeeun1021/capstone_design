@@ -20,6 +20,7 @@ function Alert({ coordinates = [], showOverlay }) {
 
         const map = new window.kakao.maps.Map(container, options); // 지도 생성 및 객체 리턴
 
+        const centerPos = null;
         if (navigator.geolocation) {
 
           // GeoLocation을 이용해서 접속 위치를 얻어옵니다
@@ -31,6 +32,11 @@ function Alert({ coordinates = [], showOverlay }) {
             var locPosition = new window.kakao.maps.LatLng(lat, lon), // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
               message = '<div style="padding:5px;">여기에 계신가요?!</div>'; // 인포윈도우에 표시될 내용입니다
 
+
+              // 현재 위치를 임의로 송정 해수욕장으로 설정
+              locPosition = new window.kakao.maps.LatLng(35.17811965661947, 129.19825403670228)
+
+
             // 마커와 인포윈도우를 표시합니다
             displayMarker(locPosition, message);
 
@@ -38,7 +44,7 @@ function Alert({ coordinates = [], showOverlay }) {
 
         } else { // HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
 
-          var locPosition = new window.kakao.maps.LatLng(33.450701, 126.570667),
+          var locPosition = new window.kakao.maps.LatLng(35.17811965661947, 129.19825403670228),
             message = 'geolocation을 사용할수 없어요..'
 
           displayMarker(locPosition, message);
