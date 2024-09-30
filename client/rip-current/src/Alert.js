@@ -71,13 +71,13 @@ function Alert({ coordinates = [], showOverlay }) {
 
 
             // 안전하지만 이안류 발생 (주의반경 외부)
-            locPosition = new window.kakao.maps.LatLng(35.179445631264066, 129.1978242412524)
+            //locPosition = new window.kakao.maps.LatLng(35.179445631264066, 129.1978242412524)
 
             // 주의 위치 (위험반경 외부)
             //locPosition = new window.kakao.maps.LatLng(35.177016760352025, 129.1988344104301)
 
             // 위험 위치 (위험반경 내부)
-            //locPosition = new window.kakao.maps.LatLng(35.17829739569499, 129.19952195224604)
+            locPosition = new window.kakao.maps.LatLng(35.17829739569499, 129.19952195224604)
 
 
             // 마커와 인포윈도우를 표시합니다
@@ -286,13 +286,13 @@ function Alert({ coordinates = [], showOverlay }) {
 
 
               // 안전하지만 이안류 발생 (주의반경 외부)
-              locPosition = new window.kakao.maps.LatLng(35.179445631264066, 129.1978242412524)
+              //locPosition = new window.kakao.maps.LatLng(35.179445631264066, 129.1978242412524)
 
               // 주의 위치 (주의반경 내부)
               //locPosition = new window.kakao.maps.LatLng(35.177016760352025, 129.1988344104301)
 
               // 위험 위치 (위험반경 내부)
-              //locPosition = new window.kakao.maps.LatLng(35.17829739569499, 129.19952195224604)
+              locPosition = new window.kakao.maps.LatLng(35.17829739569499, 129.19952195224604)
 
 
 
@@ -362,13 +362,13 @@ function Alert({ coordinates = [], showOverlay }) {
           //currentPos = new window.kakao.maps.LatLng(lat, lon)
 
           // 안전하지만 이안류 발생 (주의반경 외부)
-          currentPos = new window.kakao.maps.LatLng(35.179445631264066, 129.1978242412524)
+          //currentPos = new window.kakao.maps.LatLng(35.179445631264066, 129.1978242412524)
 
           // 주의 위치 (위험반경 외부)
           //currentPos = new window.kakao.maps.LatLng(35.177016760352025, 129.1988344104301)
 
           // 위험 위치 (위험반경 내부)
-          //currentPos = new window.kakao.maps.LatLng(35.17829739569499, 129.19952195224604)
+          currentPos = new window.kakao.maps.LatLng(35.17829739569499, 129.19952195224604)
 
           if (map) {
             map.setCenter(currentPos);

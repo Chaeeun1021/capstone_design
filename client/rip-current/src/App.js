@@ -8,7 +8,9 @@ import PastDataViewer from './PastDataViewer'; // 확장자를 제거하고 가�
 import { Client } from '@stomp/stompjs'; // STOMP 클라이언트 사용
 
 function App() {
-  const hlsStreamUrl = 'http://4.217.235.155/stream/index.m3u8'; // HLS 비디오 스트림 URL
+  const hlsStreamUrl = 'https://capstone.koreacentral.cloudapp.azure.com/stream/index.m3u8'; // HLS 비디오 스트림 URL 
+  //const hlsStreamUrl = 'http://wsb.live.smilecdn.com/wsbrtsp29/stream29.stream/index.m3u8';
+
   const [coordinates, setCoordinates] = useState([]); // 좌표 데이터
   const clientRef = useRef(null); // STOMP 클라이언트 인스턴스를 저장하는 ref
 
