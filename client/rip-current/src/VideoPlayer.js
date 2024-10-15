@@ -84,7 +84,7 @@ const VideoPlayer = memo(({ src, coordinates = [], showOverlay }) => {
     const scaleY = videoHeight / originalVideoHeight;
 
     // 약간의 오프셋 보정 실제 박스보다 높게 표시되어서 30으로 보정하면 딱맞음
-    const yOffset = 30; // Y축 보정값, 높이가 너무 높게 나타나면 이 값을 조정
+    const yOffset = 20; // Y축 보정값, 높이가 너무 높게 나타나면 이 값을 조정
 
     return points.map(({ x, y }) => ({
       x: x * scaleX,
