@@ -4,21 +4,19 @@ import './App.css';
 import VideoPlayer from './VideoPlayer';
 import Alert from './Alert';
 import Timeline from './Timeline';
-import PastDataViewer from './PastDataViewer'; // 확장자를 제거하고 가져옵니다.
-import { Client } from '@stomp/stompjs'; // STOMP 클라이언트 사용
+import PastDataViewer from './PastDataViewer';
+import { Client } from '@stomp/stompjs';
 
 function App() {
-  const hlsStreamUrl = 'https://capstone.koreacentral.cloudapp.azure.com/stream/index.m3u8'; // HLS 비디오 스트림 URL 
-  //const hlsStreamUrl = 'http://wsb.live.smilecdn.com/wsbrtsp29/stream29.stream/index.m3u8';
-
-  const [coordinates, setCoordinates] = useState([]); // 좌표 데이터
-  const clientRef = useRef(null); // STOMP 클라이언트 인스턴스를 저장하는 ref
+  const hlsStreamUrl = 'https://capstone.koreacentral.cloudapp.azure.com/stream/index.m3u8';
+  const [coordinates, setCoordinates] = useState([]);
+  const clientRef = useRef(null);
 
   // WebSocket 연결 함수
   const connectWebSocket = () => {
     if (!clientRef.current) {
       clientRef.current = new Client({
-        brokerURL: 'ws://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ws', // WebSocket 서버 URL
+        brokerURL: 'ws://port-0-rip-lyuhc4uac61f92ea.sel4.cloudtype.app/ws',
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
@@ -32,7 +30,6 @@ function App() {
             console.log('Received message:', data);
 
             if (data.drawing) {
-              // 좌표 데이터 업데이트 (각 모서리 좌표로 변환)
               const newCoordinates = data.drawing.map((box) => {
                 return [
                   { x: box[0][0], y: box[0][1] }, // Top-left
@@ -61,11 +58,10 @@ function App() {
         }
       });
 
-      clientRef.current.activate(); // WebSocket 연결 시작
+      clientRef.current.activate();
     }
   };
 
-  // WebSocket 연결 및 정리
   useEffect(() => {
     connectWebSocket();
 
@@ -75,7 +71,7 @@ function App() {
         console.log('WebSocket connection closed on cleanup.');
       }
     };
-  }, []); // 처음 렌더링 시 WebSocket 연결
+  }, []);
 
   return (
     <Router>
@@ -114,9 +110,7 @@ function App() {
             <Route path="/pastData" element={<PastDataViewer />} />
             <Route 
             path="/alert" 
-            element={<Alert
-              coordinates={coordinates}
-              showOverlay={true} />} />
+            element={<Alert coordinates={coordinates} showOverlay={true} />} />
           </Routes>
         </main>
         <footer>
