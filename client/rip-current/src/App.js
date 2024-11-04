@@ -10,9 +10,16 @@ import { Client } from '@stomp/stompjs';
 function App() {
   const hlsStreamUrl = 'https://capstone.koreacentral.cloudapp.azure.com/stream/index.m3u8';
   const [coordinates, setCoordinates] = useState([]);
+  const [coordinateReceivedTime, setCoordinateReceivedTime] = useState(null);
+  const [currentKSTTime, setCurrentKSTTime] = useState(null);
   const clientRef = useRef(null);
 
-  // WebSocket 연결 함수
+  // 한국 표준시 업데이트 함수
+  const updateKSTTime = () => {
+    const kstTime = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+    setCurrentKSTTime(kstTime);
+  };
+
   const connectWebSocket = () => {
     if (!clientRef.current) {
       clientRef.current = new Client({
@@ -24,22 +31,21 @@ function App() {
         onConnect: () => {
           console.log('WebSocket connection established.');
 
-          // STOMP 메시지 구독
           clientRef.current.subscribe('/topic/ripData', (message) => {
             const data = JSON.parse(message.body);
             console.log('Received message:', data);
 
             if (data.drawing) {
-              const newCoordinates = data.drawing.map((box) => {
-                return [
-                  { x: box[0][0], y: box[0][1] }, // Top-left
-                  { x: box[1][0], y: box[1][1] }, // Top-right
-                  { x: box[2][0], y: box[2][1] }, // Bottom-right
-                  { x: box[3][0], y: box[3][1] }, // Bottom-left
-                ];
-              });
+              const newCoordinates = data.drawing.map((box) => [
+                { x: box[0][0], y: box[0][1] },
+                { x: box[1][0], y: box[1][1] },
+                { x: box[2][0], y: box[2][1] },
+                { x: box[3][0], y: box[3][1] },
+              ]);
+              setCoordinates(newCoordinates);
 
-              setCoordinates(newCoordinates); // 좌표 업데이트
+              // 좌표 수신 시간 설정
+              setCoordinateReceivedTime(data.date_time);
             }
           });
         },
@@ -64,12 +70,15 @@ function App() {
 
   useEffect(() => {
     connectWebSocket();
+    updateKSTTime();
+    const interval = setInterval(updateKSTTime, 1000); // 매초마다 현재 KST 업데이트
 
     return () => {
       if (clientRef.current) {
         clientRef.current.deactivate();
         console.log('WebSocket connection closed on cleanup.');
       }
+      clearInterval(interval); // 컴포넌트 언마운트 시 KST 업데이트 멈춤
     };
   }, []);
 
@@ -101,20 +110,24 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={<VideoPlayer
-                src={hlsStreamUrl}
-                coordinates={coordinates}
-                showOverlay={true} // 오버레이 표시를 위한 prop
-              />}
+              element={
+                <VideoPlayer
+                  src={hlsStreamUrl}
+                  coordinates={coordinates}
+                  showOverlay={true}
+                />
+              }
             />
             <Route path="/pastData" element={<PastDataViewer />} />
-            <Route 
-            path="/alert" 
-            element={<Alert coordinates={coordinates} showOverlay={true} />} />
+            <Route
+              path="/alert"
+              element={<Alert coordinates={coordinates} showOverlay={true} />}
+            />
           </Routes>
+          
         </main>
         <footer>
-          <Timeline />
+          <Timeline coordinateReceivedTime={coordinateReceivedTime} currentKSTTime={currentKSTTime} />
         </footer>
       </div>
     </Router>
