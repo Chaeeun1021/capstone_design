@@ -6,6 +6,7 @@ import Alert from './Alert';
 import Timeline from './Timeline';
 import PastDataViewer from './PastDataViewer';
 import { Client } from '@stomp/stompjs';
+import Header from './Header';
 
 function App() {
   const hlsStreamUrl = 'https://capstone.koreacentral.cloudapp.azure.com/stream/index.m3u8';
@@ -83,27 +84,27 @@ function App() {
   }, []);
 
   return (
-    <Router>
       <div className="App">
         <header className="App-header">
           <nav>
             <ul>
               <li>
-                <NavLink to="/alert" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
+                <NavLink to="/app/alert" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
                   실시간 알림
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })} end>
+                <NavLink to="/app" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })} end>
                   실시간 영상
                 </NavLink>
               </li>
               <li>
-                <NavLink to="/pastData" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
+                <NavLink to="/app/pastData" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
                   과거 데이터 조회
                 </NavLink>
               </li>
             </ul>
+            
           </nav>
         </header>
         <main className="main-content">
@@ -124,13 +125,11 @@ function App() {
               element={<Alert coordinates={coordinates} showOverlay={true} />}
             />
           </Routes>
-          
         </main>
         <footer>
           <Timeline coordinateReceivedTime={coordinateReceivedTime} currentKSTTime={currentKSTTime} />
         </footer>
       </div>
-    </Router>
   );
 }
 
