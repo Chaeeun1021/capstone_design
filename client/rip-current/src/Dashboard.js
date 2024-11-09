@@ -34,7 +34,7 @@ function Dashboard() {
       <header className="dashboard-header">
         <h1 className="dashboard-header-title">딥러닝 모델을 이용한 이안류 탐지 서비스</h1>
         <p className="dashboard-header-description">
-          해수욕장의 CCTV 영상을 통해 실시간으로 이안류를 탐지하고, <br />발생 위치와 시간 정보를 제공합니다.
+          해수욕장의 CCTV 영상을 통해 실시간으로 이안류를 탐지하고, 발생 위치와 시간 정보를 제공합니다.
         </p>
         <a href="#q-section" className="dashboard-header-link">RIP 서비스 사용하기 ➔</a>
       </header>

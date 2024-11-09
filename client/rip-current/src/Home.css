@@ -1,29 +1,25 @@
-@font-face { 
+@font-face {
   font-family: 'Pretendard-Regular';
   src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
 }
-
 a {
   text-decoration: none;
 }
-
 body {
   font-family: "Pretendard-Regular";
   background-color: white;
+  
 }
-
 .logo {
   line-height: 0px;
   margin-left: 20px;
 }
-
 .logo > h2 {
   font-size: 26px;
   margin-left: 30px;
 }
-
 .navigation ul {
   display: flex;
   list-style: none;
@@ -49,7 +45,8 @@ body {
   padding-bottom: 20px;
   padding-left: 20px;
   border-bottom: solid 1px rgb(223, 223, 223);
-  position: fixed;
+  
+  position: fixed; /* 상단에 고정 */
   top: 0;
   left: 0;
   width: 100%;
@@ -70,12 +67,11 @@ body {
   text-align: center;
   justify-content: center;
   border-radius: 8px;
+  
 }
-
 .home-container section {
   width: 100%;
 }
-
 .home-banner {
   width: 100%;
   padding: 15%;
@@ -83,6 +79,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  
 }
 
 .headline {
@@ -100,6 +97,7 @@ body {
 }
 
 .subheadline {
+  
   font-size: 20px;
   color: #363636;
   line-height: 2.0em;
@@ -107,41 +105,39 @@ body {
   text-align: left;
   display: flex;
   padding: 20px;
+  
 }
-
 .subheadline li {
   background-color: red;
   align-items: center;
   margin: 5px;
   text-decoration: none;
 }
-
 .footer {
   padding: 20px;
   text-align: center;
   background-color: #f5f0ec;
 }
-
 .section-select {
   display: flex;
   align-items: center;
+  
   padding: 5%;
-  width: 95%;
+  width: 95%; 
+  
 }
-
 .title {
   color:#333;
   font-weight: bold;
   margin: 0;
-  margin-right: 10px;
-  white-space: nowrap;
+  margin-right: 10px; 
+  white-space: nowrap; 
 }
-
 .divider-line {
   flex-grow: 1;
   height: 1px;
-  background-color: #333;
-  opacity: 0.5;
+  background-color: #333; 
+  opacity: 0.5; 
 }
 
 .product-list {
@@ -150,7 +146,6 @@ body {
   margin-bottom: 45px;
   justify-content: center;
   padding-bottom: 100px;
-  flex-wrap: wrap;
 }
 
 .product-card {
@@ -182,11 +177,12 @@ body {
   align-items: center;
   height: 200px;
   margin-bottom: 10px;
+  
 }
 
 .product-image {
   height: 100%;
-  border-radius: 10px 10px 0px 0px;
+  border-radius: 10px 10px 0px 0px ;
   width: 100%;
 }
 
@@ -196,52 +192,15 @@ body {
   color: #333;
   margin-top: 15px;
 }
-
-/* 모바일 화면 (767px 이하)에서만 적용 */
+/* 모바일 화면 크기 (767px 이하)에서만 적용 */
 @media (max-width: 767px) {
-  .home-container {
-    padding: 0 10px;
-  }
-
-  .subheadline {
-    width: 90%;
-    padding: 10px;
-    text-align: center;
+  .product-list {
+    flex-direction: column; /* 카드들이 세로로 쌓이도록 설정 */
+    align-items: center; /* 카드들이 중앙에 정렬되도록 설정 */
   }
 
   .product-card {
-    width: 90%;
-    margin: 10px auto;
-  }
-
-  .headline {
-    font-size: 2rem;
-  }
-
-  .home-banner {
-    padding: 10%;
-  }
-
-  .navigation ul {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .section-select {
-    flex-direction: column;
-    align-items: center;
-    padding: 5%;
-    width: 100%;
-  }
-}
-/* 모바일 스타일 */
-@media (max-width: 767px) {
-  .navigation ul {
-    display: flex; /* 모바일에서도 항상 보이도록 설정 */
-    flex-direction: row; /* 메뉴가 가로로 배치되도록 설정 */
-  }
-
-  .navigation li {
-    margin-right: 20px; /* 모바일 화면에서 간격 조정 */
+    width: 60%; /* 모바일 화면에서 카드가 화면 너비의 90%를 차지하도록 설정 */
+    margin: 10px 0; /* 카드 사이에 상하 여백 추가 */
   }
 }
