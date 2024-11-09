@@ -10,7 +10,8 @@ a {
 body {
   font-family: "Pretendard-Regular";
   background-color: white;
-  
+  margin: auto;
+  padding: auto;
 }
 .logo {
   line-height: 0px;
@@ -74,7 +75,7 @@ body {
 }
 .home-banner {
   width: 100%;
-  padding: 15%;
+  padding: 15% 0 15%;
   background-image: url('./images/wave.jpg');
   background-size: cover;
   background-position: center;
