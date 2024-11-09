@@ -36,21 +36,21 @@ function Alert({ coordinates = [], showOverlay }) {
         setMap(map); // 지도 상태 업데이트
 
 
-        /*
-        // 클릭시 위도 경도 콘솔 출력
-        window.kakao.maps.event.addListener(map, 'click', function(mouseEvent) {        
-    
-          // 클릭한 위도, 경도 정보를 가져옵니다 
-          var latlng = mouseEvent.latLng; 
-          
-          // 마커 위치를 클릭한 위치로 옮깁니다
-          
-          var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
-          message += '경도는 ' + latlng.getLng() + ' 입니다';
-          
-          console.log(message);
-      });
-      */
+
+        // // 클릭시 위도 경도 콘솔 출력
+        // window.kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
+
+        //   // 클릭한 위도, 경도 정보를 가져옵니다 
+        //   var latlng = mouseEvent.latLng;
+
+        //   // 마커 위치를 클릭한 위치로 옮깁니다
+
+        //   var message = '클릭한 위치의 위도는 ' + latlng.getLat() + ' 이고, ';
+        //   message += '경도는 ' + latlng.getLng() + ' 입니다';
+
+        //   console.log(message);
+        // });
+
 
 
         const centerPos = null;
@@ -161,25 +161,145 @@ function Alert({ coordinates = [], showOverlay }) {
         // marker.setMap(map); // 마커를 지도 위에 표시
         // marker.setZIndex(1);
 
-        const polygonPath = [
+
+        /**
+         * 
+         * 
+         * 
+         * 카메라 마커 , 화각 범위
+         * 
+         * 
+         * 
+         */
+        // 카메라 마커 추가 1
+        var imageSrc = `${process.env.PUBLIC_URL}/cctv_marker.png`, // 마커이미지의 주소입니다    
+          imageSize = new window.kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+          imageOption = { offset: new window.kakao.maps.Point(32, 69) };
+
+        // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+        var markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+          markerPosition = new window.kakao.maps.LatLng(35.178924708648566, 129.19996141697447); // 마커가 표시될 위치입니다
+
+        // 마커를 생성합니다
+        var cctv_marker = new window.kakao.maps.Marker({
+          position: markerPosition,
+          image: markerImage // 마커이미지 설정 
+        });
+
+        // 마커가 지도 위에 표시되도록 설정합니다
+        cctv_marker.setMap(map);
+
+
+        const polygonPath1 = [
           new window.kakao.maps.LatLng(35.178924708648566, 129.19996141697447),
           new window.kakao.maps.LatLng(35.177380384945536, 129.19940394847845),
           new window.kakao.maps.LatLng(35.17911840034305, 129.20219467572807),
         ];
 
         // 지도에 표시할 다각형을 생성합니다
-        const polygon = new window.kakao.maps.Polygon({
-          path: polygonPath, // 그려질 다각형의 좌표 배열입니다
+        const polygon1 = new window.kakao.maps.Polygon({
+          path: polygonPath1, // 그려질 다각형의 좌표 배열입니다
           strokeWeight: 3, // 선의 두께입니다
-          strokeColor: '#FF8484', // 선의 색깔입니다
+          strokeColor: '#08088A', // 선의 색깔입니다
           strokeOpacity: 0.5, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
           strokeStyle: 'solid', // 선의 스타일입니다
-          fillColor: '#FF8484', // 채우기 색깔입니다
+          fillColor: '#EFFBFB', // 채우기 색깔입니다
           fillOpacity: 0.4, // 채우기 불투명도 입니다
           zIndex: 1
         });
 
-        polygon.setMap(map);
+        polygon1.setMap(map);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+        // 카메라 마커 추가 - 고장 1
+        var imageSrc = `${process.env.PUBLIC_URL}/unusable_cctv_marker.png`, // 마커이미지의 주소입니다    
+          imageSize = new window.kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+          imageOption = { offset: new window.kakao.maps.Point(32, 69) };
+
+        // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+        var markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+          markerPosition = new window.kakao.maps.LatLng(35.18073569660896, 129.2034456534828); // 마커가 표시될 위치입니다
+
+        // 마커를 생성합니다
+        var unsable_cctv_marker1 = new window.kakao.maps.Marker({
+          position: markerPosition,
+          image: markerImage // 마커이미지 설정 
+        });
+
+        // 마커가 지도 위에 표시되도록 설정합니다
+        unsable_cctv_marker1.setMap(map);
+
+        const polygonPath2 = [
+          new window.kakao.maps.LatLng(35.18073569660896, 129.2034456534828),
+          new window.kakao.maps.LatLng(35.17769126487736, 129.2060908312752),
+          new window.kakao.maps.LatLng(35.177116262276606, 129.20203638693593),
+        ];
+
+        // 지도에 표시할 다각형을 생성합니다
+        const polygon2 = new window.kakao.maps.Polygon({
+          path: polygonPath2, // 그려질 다각형의 좌표 배열입니다
+          strokeWeight: 3, // 선의 두께입니다
+          strokeColor: '#08088A', // 선의 색깔입니다
+          strokeOpacity: 0.5, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+          strokeStyle: 'solid', // 선의 스타일입니다
+          fillColor: '#EFFBFB', // 채우기 색깔입니다
+          fillOpacity: 0.4, // 채우기 불투명도 입니다
+          zIndex: 1
+        });
+
+        polygon2.setMap(map);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+        // 카메라 마커 추가 - 고장 2
+        var imageSrc = `${process.env.PUBLIC_URL}/unusable_cctv_marker.png`, // 마커이미지의 주소입니다    
+          imageSize = new window.kakao.maps.Size(64, 69), // 마커이미지의 크기입니다
+          imageOption = { offset: new window.kakao.maps.Point(32, 69) };
+
+        // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+        var markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+          markerPosition = new window.kakao.maps.LatLng(35.17619082460755, 129.19767074203446); // 마커가 표시될 위치입니다
+
+        // 마커를 생성합니다
+        var unsable_cctv_marker2 = new window.kakao.maps.Marker({
+          position: markerPosition,
+          image: markerImage // 마커이미지 설정 
+        });
+
+        // 마커가 지도 위에 표시되도록 설정합니다
+        unsable_cctv_marker2.setMap(map);
+
+        const polygonPath3 = [
+          new window.kakao.maps.LatLng(35.17619082460755, 129.19767074203446),
+          new window.kakao.maps.LatLng(35.17432441050954, 129.19897040408284),
+          new window.kakao.maps.LatLng(35.17691939444345, 129.20022564552457),
+        ];
+
+        // 지도에 표시할 다각형을 생성합니다
+        const polygon3 = new window.kakao.maps.Polygon({
+          path: polygonPath3, // 그려질 다각형의 좌표 배열입니다
+          strokeWeight: 3, // 선의 두께입니다
+          strokeColor: '#08088A', // 선의 색깔입니다
+          strokeOpacity: 0.5, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+          strokeStyle: 'solid', // 선의 스타일입니다
+          fillColor: '#EFFBFB', // 채우기 색깔입니다
+          fillOpacity: 0.4, // 채우기 불투명도 입니다
+          zIndex: 1
+        });
+
+        polygon3.setMap(map);
+        /**
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         * 
+         */
 
         console.log(coordinates);
 
@@ -405,7 +525,7 @@ function Alert({ coordinates = [], showOverlay }) {
         <button
           onClick={handleClick}
           style={{
-            width: '50px', 
+            width: '50px',
             height: '50px',
             bottom: '20px', // 우측 하단에서의 거리
             right: '20px',
