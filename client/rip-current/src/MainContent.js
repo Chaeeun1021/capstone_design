@@ -4,8 +4,9 @@ import sj from './images/image.png';
 import Dashboard from './Dashboard';
 function MainContent() {
     const navigate = useNavigate();
-    const handleButtonClick = () => {
-        navigate('/app'); // /app 경로로 이동
+    const handleButtonClick = (path, disabled) => {
+        if (disabled) return; // disabled 상태이면 이동하지 않음
+        navigate(path); // 경로로 이동
     };
     const products = [
         {
