@@ -4,6 +4,10 @@ import cctv from './images/cctv.png'
 import alert from './images/alert.png'
 import database from './images/database.png'
 import { useEffect, useRef, useState } from 'react';
+import { PiSecurityCamera } from "react-icons/pi";
+import { GoAlert  } from "react-icons/go";
+import { LuDatabaseBackup } from "react-icons/lu";
+import { BsClipboardData } from "react-icons/bs";
 function Dashboard() {
   const [isVisible, setIsVisible] = useState(false);
   const dashboardRef = useRef();
@@ -41,21 +45,22 @@ function Dashboard() {
 
       <div className="dashboard-features">
         <div className="dashboard-feature">
-          <img src={cctv} alt="개인 맞춤형 편집기" className="dashboard-feature-icon" />
+          <PiSecurityCamera  className='react-icons'/>
           <h3 className="dashboard-feature-title">실시간 탐지</h3>
           <p className="dashboard-feature-description">
             CCTV를 통해 실시간으로 이안류를 탐지합니다.
           </p>
         </div>
         <div className="dashboard-feature">
-          <img src={alert} alt="개인 맞춤형 편집기" className="dashboard-feature-icon" />
+          
+          <GoAlert className='react-icons'/>
           <h3 className="dashboard-feature-title">경고 알림</h3>
           <p className="dashboard-feature-description">
             사용자의 위치에 기반한 알림 서비스를 제공합니다.
           </p>
         </div>
         <div className="dashboard-feature">
-          <img src={database} alt="AI 커넥터 베타" className="dashboard-feature-icon" />
+        <BsClipboardData   className='react-icons'/>
           <h3 className="dashboard-feature-title">과거 데이터 제공</h3>
           <p className="dashboard-feature-description">
             과거 이안류 데이터를 날짜 및 시간별로 제공합니다.

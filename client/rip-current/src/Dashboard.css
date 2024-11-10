@@ -28,6 +28,7 @@
 .dashboard-header-description {
   color: #0e0e0e;
   font-size: 15px;
+  line-height: 22px;
 }
 
 .dashboard-header-link {
@@ -68,7 +69,7 @@
 }
 
 .dashboard-feature-description {
-  color: #666;
+  color: #2c2c2c;
   font-size: 14px;
   margin: 5px;
   text-align: center;
@@ -81,6 +82,11 @@
 .dashboard-campaign-image {
   width: 100%;
   max-width: 800px;
+}
+.react-icons {
+  width: 40px;
+  height: 40px;
+  color:#07102c;
 }
 @media (max-width: 767px) {
   .dashboard-header-title {
@@ -105,7 +111,11 @@
     width: 35px;
     height: 35px;
   }
-
+  .react-icons {
+    margin-right: 20px;
+    width: 50px;
+    height: auto;
+  }
   .dashboard-feature-title {
     font-size: 1rem;
     font-weight: bold;
@@ -115,8 +125,8 @@
 
   .dashboard-feature-description {
     font-size: 0.9rem;
-    color: #666;
     text-align: left;
-    line-height: 23px;
+    line-height: 22px;
+    margin-top: 10px;
   }
 }
