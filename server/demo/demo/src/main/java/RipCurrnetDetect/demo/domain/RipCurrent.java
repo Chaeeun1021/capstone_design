@@ -12,6 +12,7 @@ public class RipCurrent {
     private int boundingCount;
     //@Lob
     private String drawing;
+    private float confidenceScore;
 
     public Long getId() {
         return id;
@@ -44,4 +45,12 @@ public class RipCurrent {
     public void setDrawing(String drawing) {
         this.drawing = drawing;
     }
+    public float getConfidenceScore() {
+        return confidenceScore;
+    }
+
+    public void setConfidenceScore(float confidenceScore) {
+        this.confidenceScore = confidenceScore;
+    }
+
 }

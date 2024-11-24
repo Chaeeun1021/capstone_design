@@ -20,15 +20,19 @@ public class RipService {
     // 이안류 데이터 저장
     public RipCurrent saveRip(RipCurrentDTO ripCurrentDTO) throws JsonProcessingException {
         RipCurrent ripCurrent = null;
-        List<List<Integer[]>> drawingDatas = ripCurrentDTO.getDrawing();
+
         // dto -> entity 변환
-        for (List<Integer[]> drawing : drawingDatas) {
+        for (RipCurrentDTO.Drawing drawing : ripCurrentDTO.getDrawing()) {
             ripCurrent = new RipCurrent();
+            // 기본 필드 설정
             ripCurrent.setDateTime(ripCurrentDTO.getDateTime());
             ripCurrent.setBoundingCount(ripCurrentDTO.getBoundingCount());
-            System.out.println(DataConvertor.listToString(drawing));
-            // List<Integer[]> 타입의 데이터를 DB에 저장하기 어려우므로 String으로 변환
-            ripCurrent.setDrawing(DataConvertor.listToString(drawing));
+
+            // coordinates를 String으로 변환하여 저장 (DB 저장을 위해)
+            String coordinatesString = DataConvertor.listToString(drawing.getCoordinates());
+            ripCurrent.setDrawing(coordinatesString);
+            // confidence_score를 설정
+            ripCurrent.setConfidenceScore(drawing.getConfidenceScore());
             // db 저장
             ripRepository.save(ripCurrent);
         }

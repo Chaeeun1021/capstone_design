@@ -32,7 +32,10 @@ public class RipController {
             // 이안류 데이터 저장
             RipCurrent ripCurrent = ripService.saveRip(ripCurrentDTO);
             System.out.println("저장된 데이터: " + ripCurrent.getId());
-
+            System.out.println("Received data:");
+            System.out.println("DateTime: " + ripCurrent.getDateTime());
+            System.out.println("Bounding Count: " + ripCurrent.getBoundingCount());
+            System.out.println("Drawing: " + ripCurrent.getDrawing());
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (JsonProcessingException e) {
             // JSON 파싱 예외처리
