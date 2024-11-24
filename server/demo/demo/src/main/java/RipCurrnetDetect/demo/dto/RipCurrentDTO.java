@@ -16,5 +16,17 @@ public class RipCurrentDTO {
     @JsonProperty("bounding_count")
     private int boundingCount;
 
-    private List<List<Integer[]>> drawing;
+    @JsonProperty("drawing")
+    private List<Drawing> drawing; // Drawing 객체 리스트
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Drawing {
+        @JsonProperty("coordinates")
+        private List<List<Integer>> coordinates; // 좌표값 리스트
+
+        @JsonProperty("confidence_score")
+        private float confidenceScore; // 신뢰도 점수
+    }
 }
