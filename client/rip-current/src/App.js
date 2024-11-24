@@ -6,16 +6,14 @@ import Alert from './Alert';
 import Timeline from './Timeline';
 import PastDataViewer from './PastDataViewer';
 import { Client } from '@stomp/stompjs';
-import Header from './Header';
 
 function App() {
   const hlsStreamUrl = 'https://capstone.koreacentral.cloudapp.azure.com/stream/index.m3u8';
-  const [coordinates, setCoordinates] = useState([]);
+  const [coordinates, setCoordinates] = useState([]); // Bounding box + confidence_score 상태
   const [coordinateReceivedTime, setCoordinateReceivedTime] = useState(null);
   const [currentKSTTime, setCurrentKSTTime] = useState(null);
   const clientRef = useRef(null);
 
-  // 한국 표준시 업데이트 함수
   const updateKSTTime = () => {
     const kstTime = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
     setCurrentKSTTime(kstTime);
@@ -37,15 +35,11 @@ function App() {
             console.log('Received message:', data);
 
             if (data.drawing) {
-              const newCoordinates = data.drawing.map((box) => [
-                { x: box[0][0], y: box[0][1] },
-                { x: box[1][0], y: box[1][1] },
-                { x: box[2][0], y: box[2][1] },
-                { x: box[3][0], y: box[3][1] },
-              ]);
+              const newCoordinates = data.drawing.map((item) => ({
+                coordinates: item.coordinates.map((point) => ({ x: point[0], y: point[1] })), // Bounding box 좌표
+                confidence_score: item.confidence_score, // Confidence score 추가
+              }));
               setCoordinates(newCoordinates);
-
-              // 좌표 수신 시간 설정
               setCoordinateReceivedTime(data.date_time);
             }
           });
@@ -62,74 +56,94 @@ function App() {
 
         onWebSocketError: (event) => {
           console.error('WebSocket error: ', event);
-        }
+        },
       });
 
       clientRef.current.activate();
     }
   };
 
+  const startDetection = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/start', {
+        method: 'POST',
+      });
+      if (response.ok) {
+        console.log('Detection started successfully');
+      } else {
+        console.error('Failed to start detection:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error starting detection:', error);
+    }
+  };
+
   useEffect(() => {
+    // 웹소켓 연결
     connectWebSocket();
+
+    // 현재 시간 업데이트
     updateKSTTime();
-    const interval = setInterval(updateKSTTime, 1000); // 매초마다 현재 KST 업데이트
+    const interval = setInterval(updateKSTTime, 1000);
+
+    // /start API 호출
+    startDetection();
 
     return () => {
       if (clientRef.current) {
         clientRef.current.deactivate();
         console.log('WebSocket connection closed on cleanup.');
       }
-      clearInterval(interval); // 컴포넌트 언마운트 시 KST 업데이트 멈춤
+      clearInterval(interval);
     };
   }, []);
 
   return (
-      <div className="App">
-        <header className="App-header">
-          <nav>
-            <ul>
-              <li>
-                <NavLink to="/app/alert" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
-                  실시간 알림
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/app" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })} end>
-                  실시간 영상
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/app/pastData" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
-                  과거 데이터 조회
-                </NavLink>
-              </li>
-            </ul>
-            
-          </nav>
-        </header>
-        <main className="main-content">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <VideoPlayer
-                  src={hlsStreamUrl}
-                  coordinates={coordinates}
-                  showOverlay={true}
-                />
-              }
-            />
-            <Route path="/pastData" element={<PastDataViewer />} />
-            <Route
-              path="/alert"
-              element={<Alert coordinates={coordinates} showOverlay={true} />}
-            />
-          </Routes>
-        </main>
-        <footer>
-          <Timeline coordinateReceivedTime={coordinateReceivedTime} currentKSTTime={currentKSTTime} />
-        </footer>
-      </div>
+    <div className="App">
+      <header className="App-header">
+        <nav>
+          <ul>
+            <li>
+              <NavLink to="/app/alert" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
+                실시간 알림
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/app" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })} end>
+                실시간 영상
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/app/pastData" style={({ isActive }) => ({ fontWeight: isActive ? 'bold' : 'normal' })}>
+                과거 데이터 조회
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main className="main-content">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <VideoPlayer
+                src={hlsStreamUrl}
+                coordinates={coordinates} // 수정된 데이터 구조 전달
+                showOverlay={true}
+              />
+            }
+          />
+          <Route path="/pastData" element={<PastDataViewer />} />
+          <Route
+            path="/alert"
+            element={<Alert coordinates={coordinates} showOverlay={true} />}
+          />
+        </Routes>
+      </main>
+      <footer>
+        <Timeline coordinateReceivedTime={coordinateReceivedTime} currentKSTTime={currentKSTTime} />
+      </footer>
+    </div>
   );
 }
 

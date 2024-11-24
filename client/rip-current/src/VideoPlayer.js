@@ -116,26 +116,41 @@ const VideoPlayer = memo(({ src, coordinates = [], showOverlay, syncTimestamp })
         />
         {showOverlay && overlayCoordinates.length > 0 && (
           <div className="overlay">
-            {overlayCoordinates.map((box, index) => {
-              const scaledBox = scaleCoordinates(box);
+            {overlayCoordinates.map((item, index) => {
+              const scaledBox = scaleCoordinates(item.coordinates);
               const top = `${scaledBox[0].y}px`;
               const left = `${scaledBox[0].x}px`;
               const width = `${scaledBox[1].x - scaledBox[0].x}px`;
               const height = `${scaledBox[2].y - scaledBox[0].y}px`;
 
               return (
-                <div
-                  key={index}
-                  className="box active"
-                  style={{
-                    top,
-                    left,
-                    width,
-                    height,
-                    position: 'absolute',
-                    border: '2px solid red',
-                  }}
-                ></div>
+                <div key={index} style={{ position: 'relative' }}>
+                  <div
+                    className="box active"
+                    style={{
+                      top,
+                      left,
+                      width,
+                      height,
+                      position: 'absolute',
+                      border: '2px solid red',
+                    }}
+                  ></div>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: `${scaledBox[0].y - 20}px`,
+                      left: `${scaledBox[0].x}px`,
+                      color: 'white',
+                      backgroundColor: 'black',
+                      padding: '2px 5px',
+                      borderRadius: '3px',
+                      fontSize: '12px',
+                    }}
+                  >
+                    {`Confidence: ${item.confidence_score.toFixed(2)}`}
+                  </span>
+                </div>
               );
             })}
           </div>
