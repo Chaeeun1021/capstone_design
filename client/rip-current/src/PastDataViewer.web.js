@@ -1,8 +1,7 @@
-// PastDataViewer.web.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import './PastDataViewer.web.css'; // CSS 파일 가져오기
+import './PastDataViewer.web.css';
 import axios from 'axios';
 
 function PastDataViewer() {
@@ -10,11 +9,12 @@ function PastDataViewer() {
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
   const [selectedStartTime, setSelectedStartTime] = useState('00:00:00');
   const [selectedEndTime, setSelectedEndTime] = useState('23:59:59');
-  const [dataList, setDataList] = useState([]);
   const [coordinates, setCoordinates] = useState([]);
+  const [scaledCoordinates, setScaledCoordinates] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const imageSrc = '/beach2.png'; // 웹에서는 URI 사용
+  const imageRef = useRef(null);
+  const imageSrc = '/beach_past.JPG'; // 이미지 경로
   const originalImageWidth = 1920;
   const originalImageHeight = 1080;
 
@@ -55,30 +55,23 @@ function PastDataViewer() {
             try {
               const parsedDrawing = JSON.parse(item.drawing);
               if (Array.isArray(parsedDrawing) && parsedDrawing.length === 4) {
-                const [topLeft, topRight, bottomRight, bottomLeft] = parsedDrawing;
-                return [{
-                  topLeft: { x: topLeft[0], y: topLeft[1] },
-                  bottomRight: { x: bottomRight[0], y: bottomRight[1] },
-                }];
+                const [topLeft, , bottomRight] = parsedDrawing;
+                return [
+                  {
+                    topLeft: { x: topLeft[0], y: topLeft[1] },
+                    bottomRight: { x: bottomRight[0], y: bottomRight[1] },
+                  },
+                ];
               }
             } catch (error) {
               console.error('Error parsing drawing:', error);
               return [];
             }
-          } else if (Array.isArray(item.drawing) && item.drawing.length === 4) {
-            const [topLeft, topRight, bottomRight, bottomLeft] = item.drawing;
-            return [{
-              topLeft: { x: topLeft[0], y: topLeft[1] },
-              bottomRight: { x: bottomRight[0], y: bottomRight[1] },
-            }];
-          } else {
-            console.error('Invalid drawing format:', item.drawing);
-            return [];
           }
+          return [];
         });
 
         setCoordinates(newCoordinates);
-        setDataList(responseData);
         setLoading(false);
       })
       .catch((error) => {
@@ -87,16 +80,53 @@ function PastDataViewer() {
       });
   };
 
+  useEffect(() => {
+    const scaleCoordinates = () => {
+      if (!imageRef.current) return;
+
+      const { width: displayedWidth, height: displayedHeight } = imageRef.current.getBoundingClientRect();
+
+      // 이미지 렌더링 영역에서 실제 스케일링 비율 계산
+      const xScale = displayedWidth / originalImageWidth;
+      const yScale = displayedHeight / originalImageHeight;
+
+      const newScaledCoordinates = coordinates.map(({ topLeft, bottomRight }) => ({
+        topLeft: {
+          x: topLeft.x * xScale,
+          y: topLeft.y * yScale,
+        },
+        bottomRight: {
+          x: bottomRight.x * xScale,
+          y: bottomRight.y * yScale,
+        },
+      }));
+
+      setScaledCoordinates(newScaledCoordinates);
+    };
+
+    scaleCoordinates();
+    window.addEventListener('resize', scaleCoordinates);
+
+    return () => {
+      window.removeEventListener('resize', scaleCoordinates);
+    };
+  }, [coordinates]);
+
   return (
     <div className="layout-wrapper">
       <div className="image-container">
-        <img src={imageSrc} alt="Beach Scene" className="responsive-image" />
-        {/* 웹에서 SVG 태그 사용 */}
+        <img
+          ref={imageRef}
+          src={imageSrc}
+          alt="Beach Scene"
+          className="responsive-image"
+        />
         <svg
           className="svg-overlay"
           viewBox={`0 0 ${originalImageWidth} ${originalImageHeight}`}
+          preserveAspectRatio="none"
         >
-          {coordinates.map(({ topLeft, bottomRight }, index) => (
+          {scaledCoordinates.map(({ topLeft, bottomRight }, index) => (
             <rect
               key={index}
               x={topLeft.x}
